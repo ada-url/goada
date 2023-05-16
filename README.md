@@ -1,6 +1,6 @@
 
 # goada : fast WHATGL URL library in Go
-[![Go-CI](https://github.com/ada-url/goada/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/ada-url/goada/actions/workflows/ubuntu.yml)
+[![Go-CI](https://github.com/ada-url/goada/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/ada-url/goada/actions/workflows/ubuntu.yml) [![GoDoc](https://godoc.org/github.com/ada-url/goada?status.svg)](https://godoc.org/github.com/ada-url/goada)
 
 The goada library provides support for the WHATGL URL
 standard in Go.
