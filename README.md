@@ -22,10 +22,10 @@ The standard `net/url` `Parse` function would refuse to parse the URL `"https://
 ## Usage
 
 ```Go
-    import (
-        "github.com/ada-url/goada"
-        "fmt"
-    )
+        import (
+           "github.com/ada-url/goada"
+           "fmt"
+        )
 
 	url, err := goada.New("https://www.GOogle.com")
 	if err != nil {
