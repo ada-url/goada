@@ -1,6 +1,22 @@
-name: Go-CI
+name: Ubuntu
 
-on: [push, pull_request]
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths-ignore:
+      - '**.md'
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
@@ -17,5 +33,4 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
     - name: Test
-      run: |
-        go test 
+      run: go test
