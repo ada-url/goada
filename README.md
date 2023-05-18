@@ -12,13 +12,13 @@ The goada library provides support for the WHATWG URL standard in Go.
 ### Examples
 
 ```Go
-url, nil := New("https://	www.GOoglé.com")
-fmt.Println(url.Href()) // "https://www.xn--googl-fsa.com/"
+url, nil := New("https://	www.GOoglé.com/./path/../path2/")
+fmt.Println(url.Href()) // "https://www.xn--googl-fsa.com/path2/"
 ```
 
-The standard `net/url` `Parse` function would refuse to parse the URL `"https://	www.GOoglé.com"` because it 
-contains a tabulation character. Even if we remove the tabulation character, it would still parse it to an incorrect 
-string as per the WHATGL URL standard (`https://www.GOogl%C3%A9.com`).
+The standard `net/url` `Parse` function from the Go runtime refuses to parse the URL `"https://	www.GOoglé.com/./path/../path2/"` because it 
+contains a tabulation character. Even if we remove the tabulation character, it still parses it to an incorrect 
+string as per the WHATGW URL standard (`https://www.GOogl%C3%A9.com/./path/../path2/`). That is, if fails to normalize the domain name, and it does not process the path string.
 
 ### Usage
 
