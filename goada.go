@@ -25,6 +25,8 @@ type Url struct {
 	cpointer C.ada_url
 }
 
+// parse the given string into a URL, a finalizer
+// will be set to free the URL when it is no longer needed.
 func New(urlstring string) (*Url, error) {
 	if len(urlstring) == 0 {
 		return nil, ErrEmptyString
@@ -40,6 +42,8 @@ func New(urlstring string) (*Url, error) {
 	return answer, nil
 }
 
+// parse the given strings into a URL, a finalizer
+// will be set to free the URL when it is no longer needed.
 func NewWithBase(urlstring string, basestring string) (*Url, error) {
 	if len(urlstring) == 0 || len(basestring) == 0 {
 		return nil, ErrEmptyString

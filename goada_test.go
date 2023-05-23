@@ -61,10 +61,10 @@ func TestGoodUrlSet(t *testing.T) {
 	}
 }
 
-// go test -bench BenchmarkSilly -run -
+// go test -bench Benchmark -run -
 func BenchmarkSillyAda(b *testing.B) {
 	for j := 0; j < b.N; j++ {
-		_, err := New("https://www.google.com")
+		_, err := New("https://www.Googlé.com")
 		if err != nil {
 			break
 		}
