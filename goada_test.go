@@ -3,9 +3,14 @@ package goada
 import (
 	"fmt"
 	"net/url"
-	"strings"
 	"testing"
 )
+
+func compareString(t *testing.T, expected, actual, message string) {
+	if expected != actual {
+		t.Errorf("Expected %s, but got %s. %s", expected, actual, message)
+	}
+}
 
 func TestBadUrl(t *testing.T) {
 	url, err := New("some bad url")
@@ -24,12 +29,8 @@ func TestGoodUrl(t *testing.T) {
 	}
 	fmt.Println(url.Href())
 
-	if strings.Compare(url.Href(), "https://www.google.com/") != 0 {
-		t.Error("Expected normalized url")
-	}
-	if strings.Compare(url.Protocol(), "https:") != 0 {
-		t.Error("Expected https protocol")
-	}
+	compareString(t, "https://www.google.com/", url.Href(), "Expected normalized url")
+	compareString(t, "https:", url.Protocol(), "Expected https protocol")
 }
 
 func TestGoodUrlSet(t *testing.T) {
@@ -39,26 +40,16 @@ func TestGoodUrlSet(t *testing.T) {
 	}
 	fmt.Println(url.Href())
 
-	if strings.Compare(url.Href(), "https://www.google.com/") != 0 {
-		t.Error("Expected normalized url")
-	}
-	if strings.Compare(url.Protocol(), "https:") != 0 {
-		t.Error("Expected https protocol")
-	}
+	compareString(t, "https://www.google.com/", url.Href(), "Expected normalized url")
+	compareString(t, "https:", url.Protocol(), "Expected https protocol")
 	url.SetProtocol("http:")
-	if strings.Compare(url.Protocol(), "http:") != 0 {
-		t.Error("Expected http protocol")
-	}
+	compareString(t, "http:", url.Protocol(), "Expected http protocol")
 	url.SetHash("goada")
 	fmt.Println(url.Hash())
 
-	if strings.Compare(url.Hash(), "#goada") != 0 {
-		t.Error("Expected goada hash")
-	}
+	compareString(t, "#goada", url.Hash(), "Expected goada hash")
 	fmt.Println(url.Href())
-	if strings.Compare(url.Href(), "http://www.google.com/#goada") != 0 {
-		t.Error("Expected normalized url")
-	}
+	compareString(t, "http://www.google.com/#goada", url.Href(), "Expected normalized url")
 }
 
 // go test -bench Benchmark -run -
@@ -78,9 +69,7 @@ func TestStandard(t *testing.T) {
 		t.Error("Expected no error")
 	}
 	fmt.Println(url.Href())
-	if strings.Compare(url.Href(), "https://www.xn--googl-fsa.com/path2/") != 0 {
-		t.Error("Expected normalized url")
-	}
+	compareString(t, "https://www.xn--googl-fsa.com/path2/", url.Href(), "Expected normalized url")
 	url.Free()
 }
 
@@ -96,7 +85,5 @@ func TestStandardGP(t *testing.T) {
 		t.Error("Go url should hot fail")
 	}
 	fmt.Println(url.String())
-	if strings.Compare(url.String(), "https://www.GOogl%C3%A9.com/./path/../path2/") != 0 {
-		t.Error("Expected invalid normalized url")
-	}
+	compareString(t, "https://www.GOogl%C3%A9.com/./path/../path2/", url.String(), "Expected invalid normalized url")
 }
