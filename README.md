@@ -16,9 +16,19 @@ url, nil := New("https://	www.GOoglé.com/./path/../path2/")
 fmt.Println(url.Href()) // "https://www.xn--googl-fsa.com/path2/"
 ```
 
-The standard `net/url` `Parse` function from the Go runtime refuses to parse the URL `"https://	www.GOoglé.com/./path/../path2/"` because it 
-contains a tabulation character. Even if we remove the tabulation character, it still parses it to an incorrect 
-string as per the WHATGW URL standard (`https://www.GOogl%C3%A9.com/./path/../path2/`). That is, if fails to normalize the domain name, and it does not process the path string.
+
+A common use of a URL parser is to take a URL string and normalize it. 
+The WHATWG URL specification has been adopted by most browsers.  Other tools, such as the Go runtime, follow the RFC 3986. 
+The following table illustrates possible differences in practice (encoding of the host, encoding of the path):
+
+| string source | string value |
+|:--------------|:--------------|
+| input string | https://www.7-Eleven.com/Home/../Privacy/Montréal |
+| ada's normalized string | https://www.xn--7eleven-506c.com/Home/Privacy/Montr%C3%A9al |
+| curl 7.87 | https://www.7-Eleven.com/Privacy/Montr%C3%A9al |
+| Go runtime (`net/url`) | https://www.7-Eleven.com/Home/../Privacy/Montr%C3%A9al |
+
+The Go runtime (`net/url`) does not normalize hostnames, and it does not process pathnames properly.
 
 ### Usage
 
