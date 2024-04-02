@@ -6,7 +6,7 @@ The goada library provides support for the WHATWG URL standard in Go.
 
 ## Requirements
 
-- Go 1.20 or better.
+- Go 1.21 or better.
 
 
 ### Examples
