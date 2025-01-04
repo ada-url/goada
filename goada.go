@@ -108,13 +108,13 @@ func (u *Url) HasPort() bool {
 }
 
 func (u *Url) HasPassword() bool {
-	answer := bool(C.ada_has_port(u.cpointer))
+	answer := bool(C.ada_has_password(u.cpointer))
 	runtime.KeepAlive(u)
 	return answer
 }
 
 func (u *Url) HasHash() bool {
-	answer := bool(C.ada_has_port(u.cpointer))
+	answer := bool(C.ada_has_hash(u.cpointer))
 	runtime.KeepAlive(u)
 	return answer
 }
