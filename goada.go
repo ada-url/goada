@@ -2,7 +2,7 @@ package goada
 
 /*
 #cgo CFLAGS: -O3  -std=c11
-#cgo CXXFLAGS: -O3 -std=c++17
+#cgo CXXFLAGS: -O3 -std=c++20
 #include "ada_c.h"
 
 const char empty_string[] = "";
