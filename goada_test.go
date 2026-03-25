@@ -62,6 +62,15 @@ func BenchmarkSillyAda(b *testing.B) {
 	}
 }
 
+func BenchmarkSillyStandard(b *testing.B) {
+	for j := 0; j < b.N; j++ {
+		_, err := url.Parse("https://www.Googlé.com")
+		if err != nil {
+			break
+		}
+	}
+}
+
 func TestStandard(t *testing.T) {
 	s1 := "https://	www.GOoglé.com/./path/../path2/"
 	url, err := New(s1)
@@ -70,7 +79,6 @@ func TestStandard(t *testing.T) {
 	}
 	fmt.Println(url.Href())
 	compareString(t, "https://www.xn--googl-fsa.com/path2/", url.Href(), "Expected normalized url")
-	url.Free()
 }
 
 func TestStandardGP(t *testing.T) {
