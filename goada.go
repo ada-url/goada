@@ -5,7 +5,17 @@ package goada
 #cgo CXXFLAGS: -O3 -std=c++20
 #include "ada_c.h"
 
-const char empty_string[] = "";
+
+// ada_parse_and_validate combines parse + validity check in a single CGo call.
+// Returns the parsed URL, or NULL if invalid.
+static inline ada_url ada_parse_and_validate(const char* input, size_t length) {
+    ada_url url = ada_parse(input, length);
+    if (!ada_is_valid(url)) {
+        ada_free(url);
+        return NULL;
+    }
+    return url;
+}
 */
 import "C"
 import (
@@ -23,6 +33,7 @@ var ErrInvalidUrl = errors.New("invalid url")
 
 type Url struct {
 	cpointer C.ada_url
+	cleanup  runtime.Cleanup
 }
 
 // parse the given string into a URL, a finalizer
@@ -31,14 +42,15 @@ func New(urlstring string) (*Url, error) {
 	if len(urlstring) == 0 {
 		return nil, ErrEmptyString
 	}
-	var answer *Url
-	answer = &Url{C.ada_parse((*C.char)(unsafe.Pointer(unsafe.StringData(urlstring))), C.size_t(len(urlstring)))}
+	cptr := C.ada_parse_and_validate((*C.char)(unsafe.Pointer(unsafe.StringData(urlstring))), C.size_t(len(urlstring)))
 	runtime.KeepAlive(urlstring)
-	if !C.ada_is_valid(answer.cpointer) {
-		C.ada_free(answer.cpointer)
+	if cptr == nil {
 		return nil, ErrInvalidUrl
 	}
-	runtime.SetFinalizer(answer, free)
+	answer := &Url{cpointer: cptr}
+	answer.cleanup = runtime.AddCleanup(answer, func(cptr C.ada_url) {
+		C.ada_free(cptr)
+	}, cptr)
 	return answer, nil
 }
 
@@ -48,22 +60,18 @@ func NewWithBase(urlstring string, basestring string) (*Url, error) {
 	if len(urlstring) == 0 || len(basestring) == 0 {
 		return nil, ErrEmptyString
 	}
-	var answer *Url
-	answer = &Url{C.ada_parse_with_base((*C.char)(unsafe.Pointer(unsafe.StringData(urlstring))), C.size_t(len(urlstring)), (*C.char)(unsafe.Pointer(unsafe.StringData(basestring))), C.size_t(len(basestring)))}
+	cptr := C.ada_parse_with_base((*C.char)(unsafe.Pointer(unsafe.StringData(urlstring))), C.size_t(len(urlstring)), (*C.char)(unsafe.Pointer(unsafe.StringData(basestring))), C.size_t(len(basestring)))
 	runtime.KeepAlive(urlstring)
 	runtime.KeepAlive(basestring)
-	if !C.ada_is_valid(answer.cpointer) {
-		C.ada_free(answer.cpointer)
+	if !C.ada_is_valid(cptr) {
+		C.ada_free(cptr)
 		return nil, ErrInvalidUrl
 	}
-	runtime.SetFinalizer(answer, free)
+	answer := &Url{cpointer: cptr}
+	answer.cleanup = runtime.AddCleanup(answer, func(cptr C.ada_url) {
+		C.ada_free(cptr)
+	}, cptr)
 	return answer, nil
-}
-
-func (rb *Url) Free() {
-	// Clear the finalizer to avoid double frees
-	runtime.SetFinalizer(rb, nil)
-	free(rb)
 }
 
 func (u *Url) Valid() bool {
