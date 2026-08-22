@@ -51,13 +51,15 @@ fmt.Println(url.Href()) // prints http://www.google.com/#goada
 
 ## Performance
 
-Benchmarks comparing URL parsing performance using the top 100k URLs dataset:
+Benchmarks comparing URL parsing performance using the top 100k URLs dataset.
+All three libraries parse the same 100,025 URLs (empty lines skipped).
+Numbers are the median of 7 runs (`go test -bench BenchmarkTop100 -benchtime=3s -count=7`) on an Apple M4 Max:
 
 | Library      | ns/op (full dataset) | ns/op per URL | WHATWG URL compliant ? |
 |--------------|----------------------|---------------|------------------------|
-| github.com/ada-url/goada   | 2,206,395            | 22.0          |   YES                  |
-| Go `net/url` | 1,937,154            | 19.4          |   NO (sad face)        | 
-| github.com/nlnwa/whatwg-url   | 13,916,373           | 139.0         |   Yes                  | 
+| github.com/ada-url/goada   | 58,533,792           | 585.2         |   YES                  |
+| Go `net/url` | 31,780,421           | 317.7         |   NO (sad face)        | 
+| github.com/nlnwa/whatwg-url   | 322,011,608          | 3219.3        |   Yes                  | 
 
 Run `go test -bench BenchmarkTop100 -run -` to reproduce these results.
 
