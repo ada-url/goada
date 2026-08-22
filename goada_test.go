@@ -44,7 +44,11 @@ func init() {
 	defer file.Close()
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		benchmarkURLs = append(benchmarkURLs, scanner.Text())
+		line := scanner.Text()
+		if line == "" {
+			continue
+		}
+		benchmarkURLs = append(benchmarkURLs, line)
 	}
 	if err := scanner.Err(); err != nil {
 		fmt.Println("Failed to read benchmark dataset, benchmarks will use empty dataset")
@@ -98,38 +102,55 @@ func TestGoodUrlSet(t *testing.T) {
 	compareString(t, "http://www.google.com/#goada", url.Href(), "Expected normalized url")
 }
 
+// Parse results are stored so the compiler cannot dead-code the calls.
+var (
+	benchSinkAda    *Url
+	benchSinkStd    *url.URL
+	benchSinkWhatWG *whatwgurl.Url
+)
+
+func requireBenchmarkURLs(b *testing.B) []string {
+	b.Helper()
+	if len(benchmarkURLs) == 0 {
+		b.Fatal("empty benchmark dataset")
+	}
+	return benchmarkURLs
+}
+
 // go test -bench BenchmarkTop100 -run -
 func BenchmarkTop100Ada(b *testing.B) {
+	urls := requireBenchmarkURLs(b)
+	var out *Url
 	for j := 0; j < b.N; j++ {
-		for _, u := range benchmarkURLs {
-			_, err := New(u)
-			if err != nil {
-				break
-			}
+		// Parse every URL, including ones that fail. Breaking on error
+		// would let each library stop at a different input.
+		for _, u := range urls {
+			out, _ = New(u)
 		}
 	}
+	benchSinkAda = out
 }
 
 func BenchmarkTop100Standard(b *testing.B) {
+	urls := requireBenchmarkURLs(b)
+	var out *url.URL
 	for j := 0; j < b.N; j++ {
-		for _, u := range benchmarkURLs {
-			_, err := url.Parse(u)
-			if err != nil {
-				break
-			}
+		for _, u := range urls {
+			out, _ = url.Parse(u)
 		}
 	}
+	benchSinkStd = out
 }
 
 func BenchmarkTop100WhatWG(b *testing.B) {
+	urls := requireBenchmarkURLs(b)
+	var out *whatwgurl.Url
 	for j := 0; j < b.N; j++ {
-		for _, u := range benchmarkURLs {
-			_, err := whatwgurl.Parse(u)
-			if err != nil {
-				break
-			}
+		for _, u := range urls {
+			out, _ = whatwgurl.Parse(u)
 		}
 	}
+	benchSinkWhatWG = out
 }
 
 func TestStandard(t *testing.T) {
